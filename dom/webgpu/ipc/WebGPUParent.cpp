@@ -18,6 +18,7 @@
 #include "mozilla/layers/TextureHost.h"
 #include "mozilla/layers/WebRenderTextureHost.h"
 #include "mozilla/webgpu/FrontBufferSnapshot.h"
+#include "mozilla/webgpu/Utility.h"
 #include "mozilla/webgpu/SharedTexture.h"
 #include "mozilla/webgpu/ffi/wgpu.h"
 
@@ -278,8 +279,8 @@ extern void wgpu_parent_queue_submit(
 extern void wgpu_parent_create_swap_chain(
     WGPUWebGPUParentPtr aParent, WGPUDeviceId aDeviceId, WGPUQueueId aQueueId,
     uint32_t aWidth, uint32_t aHeight, WGPUSurfaceFormat aFormat,
-    const WGPUBufferId* aBufferIds, uintptr_t aBufferIdsLength,
-    WGPURemoteTextureOwnerId aRemoteTextureOwnerId,
+    WGPUPredefinedColorSpace aColorSpace, const WGPUBufferId* aBufferIds,
+    uintptr_t aBufferIdsLength, WGPURemoteTextureOwnerId aRemoteTextureOwnerId,
     bool aUseSharedTextureInSwapChain) {
   auto* parent = static_cast<WebGPUParent*>(aParent);
   auto buffer_ids_span = Span(aBufferIds, aBufferIdsLength);
@@ -289,7 +290,7 @@ extern void wgpu_parent_create_swap_chain(
   }
   auto size = gfx::IntSize(aWidth, aHeight);
   auto format = gfx::SurfaceFormat(aFormat);
-  auto desc = layers::RGBDescriptor(size, format, gfx::ColorSpace2::SRGB,
+  auto desc = layers::RGBDescriptor(size, format, ToColorSpace2(aColorSpace),
                                     gfx::TransferFunction::SRGB);
   auto owner = layers::RemoteTextureOwnerId{aRemoteTextureOwnerId};
   parent->DeviceCreateSwapChain(aDeviceId, aQueueId, desc, buffer_ids, owner,
@@ -882,7 +883,8 @@ static void ReadbackPresentCallback(uint8_t* userdata,
 
     auto textureData =
         req->mRemoteTextureOwner->CreateOrRecycleBufferTextureData(
-            size, data->mDesc.format(), req->mOwnerId);
+            size, data->mDesc.format(), data->mDesc.colorSpace(),
+            data->mDesc.transferFunction(), req->mOwnerId);
     if (!textureData) {
       gfxCriticalNoteOnce << "Failed to allocate BufferTextureData";
       return;
@@ -1470,6 +1472,7 @@ bool WebGPUParent::EnsureSharedTextureForSwapChain(
     if (texture->mWidth == aWidth && texture->mHeight == aHeight &&
         texture->mFormat.tag == aFormat.tag && texture->mUsage == aUsage) {
       texture->SetOwnerId(ownerId);
+      texture->SetColorSpace(data->mDesc.colorSpace());
       data->mRecycledSharedTextures.pop_front();
       mSharedTextures.emplace(aTextureId, texture);
       return true;
@@ -1479,6 +1482,9 @@ bool WebGPUParent::EnsureSharedTextureForSwapChain(
 
   auto sharedTexture = CreateSharedTexture(ownerId, aDeviceId, aTextureId,
                                            aWidth, aHeight, aFormat, aUsage);
+  if (sharedTexture) {
+    sharedTexture->SetColorSpace(data->mDesc.colorSpace());
+  }
   return static_cast<bool>(sharedTexture);
 }
 
@@ -1512,6 +1518,7 @@ void WebGPUParent::EnsureSharedTextureForReadBackPresent(
   }
 
   texture->SetOwnerId(ownerId);
+  texture->SetColorSpace(data->mDesc.colorSpace());
   std::shared_ptr<SharedTexture> shared(texture.release());
   mSharedTextures[aTextureId] = std::move(shared);
 }

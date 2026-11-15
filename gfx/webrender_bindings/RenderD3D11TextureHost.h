@@ -71,9 +71,20 @@ class RenderDXGITextureHost final : public RenderTextureHostSWGL {
                 PlaneInfo& aPlaneInfo) override;
   void UnmapPlanes() override;
   gfx::YUVRangedColorSpace GetYUVColorSpace() const override {
-    return ToYUVRangedColorSpace(ToYUVColorSpace(mColorSpace), mColorRange,
-                                 mTransferFunction);
+    // ToYUVColorSpace() crashes on values that do not name a YUV color
+    // space, such as DISPLAY_P3. Those mark RGB content, which needs no
+    // YUV->RGB conversion: report the identity color space for them.
+    const auto yuvColorSpace =
+        (mColorSpace == gfx::ColorSpace2::DISPLAY_P3 ||
+         mColorSpace == gfx::ColorSpace2::UNKNOWN)
+            ? gfx::YUVColorSpace::Identity
+            : ToYUVColorSpace(mColorSpace);
+    const auto colorRange = yuvColorSpace == gfx::YUVColorSpace::Identity
+                                ? gfx::ColorRange::FULL
+                                : mColorRange;
+    return ToYUVRangedColorSpace(yuvColorSpace, colorRange, mTransferFunction);
   }
+  gfx::ColorSpace2 GetColorSpace2() const override { return mColorSpace; }
   gfx::TransferFunction GetTransferFunction() const override {
     return mTransferFunction;
   }

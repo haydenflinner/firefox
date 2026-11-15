@@ -33,6 +33,8 @@ class SharedTextureDMABuf final : public SharedTexture {
 
   Maybe<layers::SurfaceDescriptor> ToSurfaceDescriptor() override;
 
+  void SetColorSpace(gfx::ColorSpace2 aColorSpace) override;
+
   FrontBufferSnapshot GetSnapshot() override;
 
   SharedTextureDMABuf* AsSharedTextureDMABuf() override { return this; }

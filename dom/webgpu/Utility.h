@@ -7,6 +7,7 @@
 
 #include "mozilla/dom/TypedArray.h"
 #include "mozilla/dom/WebGPUBinding.h"
+#include "mozilla/gfx/Types.h"
 #include "mozilla/webgpu/WebGPUTypes.h"
 #include "mozilla/webgpu/ffi/wgpu.h"
 #include "nsTArray.h"
@@ -16,6 +17,7 @@ class ErrorResult;
 
 namespace dom {
 struct GPUComputePassDescriptor;
+enum class GPUPredefinedColorSpace : uint8_t;
 enum class PredefinedColorSpace : uint8_t;
 template <typename T>
 class Sequence;
@@ -79,6 +81,14 @@ ffi::WGPUDepthStencilState ConvertDepthStencilState(
 
 ffi::WGPUPredefinedColorSpace ConvertPredefinedColorSpace(
     const dom::PredefinedColorSpace& aColorSpace);
+
+ffi::WGPUPredefinedColorSpace ConvertPredefinedColorSpace(
+    const dom::GPUPredefinedColorSpace& aColorSpace);
+
+dom::PredefinedColorSpace ToPredefinedColorSpace(
+    const dom::GPUPredefinedColorSpace& aColorSpace);
+
+gfx::ColorSpace2 ToColorSpace2(ffi::WGPUPredefinedColorSpace aColorSpace);
 
 mozilla::Maybe<mozilla::Buffer<uint32_t>> GetDynamicOffsetsFromArray(
     const dom::Uint32Array& aDynamicOffsetsData,

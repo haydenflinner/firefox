@@ -297,6 +297,7 @@ pub(crate) enum Message<'a> {
         queue_id: id::QueueId,
         desc: TextureDescriptor<'a>,
         format: SurfaceFormat,
+        color_space: PredefinedColorSpace,
         buffer_ids: [id::BufferId; MAX_SWAPCHAIN_BUFFER_COUNT],
         remote_texture_owner_id: RemoteTextureOwnerId,
         use_shared_texture_in_swap_chain: bool,

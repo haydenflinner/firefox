@@ -1457,8 +1457,8 @@ UniquePtr<TextureData> CanvasTranslator::CreateOrRecycleTextureData(
     const gfx::IntSize& aSize, gfx::SurfaceFormat aFormat) {
   if (mRemoteTextureOwner) {
     if (mTextureType == TextureType::Unknown) {
-      return mRemoteTextureOwner->CreateOrRecycleBufferTextureData(aSize,
-                                                                   aFormat);
+      return mRemoteTextureOwner->CreateOrRecycleBufferTextureData(
+          aSize, aFormat, gfx::ColorSpace2::SRGB, gfx::TransferFunction::SRGB);
     }
     if (UniquePtr<TextureData> data =
             mRemoteTextureOwner->GetRecycledTextureData(aSize, aFormat,

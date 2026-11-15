@@ -34,6 +34,8 @@ class SharedTextureMacIOSurface final : public SharedTexture {
 
   Maybe<layers::SurfaceDescriptor> ToSurfaceDescriptor() override;
 
+  void SetColorSpace(gfx::ColorSpace2 aColorSpace) override;
+
   FrontBufferSnapshot GetSnapshot() override;
 
   SharedTextureMacIOSurface* AsSharedTextureMacIOSurface() override {

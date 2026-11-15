@@ -67,6 +67,26 @@
           "TypeError",
           "Failed configure should generate a TypeError."
         );
+
+        // The default `colorSpace` is "srgb", and both supported values
+        // are reflected back by `getConfiguration()`.
+        canvas.width = 4;
+        canvas.height = 4;
+        context.configure({ device, format });
+        is(
+          context.getConfiguration().colorSpace,
+          "srgb",
+          "Default canvas colorSpace should be srgb."
+        );
+        for (const colorSpace of ["srgb", "display-p3"]) {
+          context.unconfigure();
+          context.configure({ device, format, colorSpace });
+          is(
+            context.getConfiguration().colorSpace,
+            colorSpace,
+            `Configured colorSpace ${colorSpace} should be reflected.`
+          );
+        }
       }
 
       SimpleTest.waitForExplicitFinish();

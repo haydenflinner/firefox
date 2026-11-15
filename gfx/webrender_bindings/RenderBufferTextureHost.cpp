@@ -202,6 +202,15 @@ gfx::YUVRangedColorSpace RenderBufferTextureHost::GetYUVColorSpace() const {
   }
 }
 
+gfx::ColorSpace2 RenderBufferTextureHost::GetColorSpace2() const {
+  switch (mDescriptor.type()) {
+    case layers::BufferDescriptor::TRGBDescriptor:
+      return mDescriptor.get_RGBDescriptor().colorSpace();
+    default:
+      return RenderTextureHost::GetColorSpace2();
+  }
+}
+
 gfx::TransferFunction RenderBufferTextureHost::GetTransferFunction() const {
   switch (mDescriptor.type()) {
     case layers::BufferDescriptor::TYCbCrDescriptor:

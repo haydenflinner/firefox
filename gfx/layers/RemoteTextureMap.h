@@ -249,6 +249,8 @@ class RemoteTextureOwnerClient final {
       RemoteTextureOwnerId aOwnerId = RemoteTextureOwnerId());
   UniquePtr<TextureData> CreateOrRecycleBufferTextureData(
       const gfx::IntSize& aSize, gfx::SurfaceFormat aFormat,
+      gfx::ColorSpace2 aColorSpace,
+      gfx::TransferFunction aTransferFunction,
       RemoteTextureOwnerId aOwnerId = RemoteTextureOwnerId());
   std::shared_ptr<gl::SharedSurface> GetRecycledSharedSurface(
       const gfx::IntSize& aSize, gfx::SurfaceFormat aFormat,

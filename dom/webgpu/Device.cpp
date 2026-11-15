@@ -990,8 +990,9 @@ already_AddRefed<Texture> Device::InitSwapChain(
     return nullptr;
   }
 
+  const auto colorSpace = ConvertPredefinedColorSpace(aConfig->mColorSpace);
   const layers::RGBDescriptor rgbDesc(aCanvasSize, aFormat,
-                                      gfx::ColorSpace2::SRGB,
+                                      ToColorSpace2(colorSpace),
                                       gfx::TransferFunction::SRGB);
 
   auto textureDesc = SwapChainTextureDescriptor(*aConfig, aCanvasSize);
@@ -999,9 +1000,9 @@ already_AddRefed<Texture> Device::InitSwapChain(
 
   ffi::wgpu_client_create_swap_chain(
       GetClient(), GetId(), mQueue->GetId(), ffiDesc.Get(),
-      (int8_t)rgbDesc.format(), aOwnerId.mId, aUseSharedTextureInSwapChain);
+      (int8_t)rgbDesc.format(), colorSpace, aOwnerId.mId,
+      aUseSharedTextureInSwapChain);
 
-  // TODO: `mColorSpace`: <https://bugzilla.mozilla.org/show_bug.cgi?id=1846608>
   // TODO: `mAlphaMode`: <https://bugzilla.mozilla.org/show_bug.cgi?id=1846605>
   return CreateTexture(textureDesc, Some(aOwnerId));
 }

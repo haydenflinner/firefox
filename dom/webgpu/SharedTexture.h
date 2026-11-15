@@ -6,6 +6,7 @@
 #define SharedTexture_H_
 
 #include "mozilla/gfx/Point.h"
+#include "mozilla/gfx/Types.h"
 #include "mozilla/layers/LayersSurfaces.h"
 #include "mozilla/webgpu/FrontBufferSnapshot.h"
 #include "mozilla/webgpu/WebGPUTypes.h"
@@ -65,6 +66,15 @@ class SharedTexture {
     return mOwnerId;
   }
 
+  // Sets the color space of the canvas contents this texture carries.
+  // Platform implementations override this to propagate the value to the
+  // underlying shared surface and/or surface descriptor.
+  virtual void SetColorSpace(const gfx::ColorSpace2 aColorSpace) {
+    mColorSpace = aColorSpace;
+  }
+
+  gfx::ColorSpace2 GetColorSpace() const { return mColorSpace; }
+
   virtual void onBeforeQueueSubmit(
       const ffi::WGPUGlobal* aContext, RawId aQueueId,
       nsTArray<ffi::WGPUVkSemaphoreHandle>& aSignalSemaphores) {}
@@ -87,6 +97,7 @@ class SharedTexture {
  protected:
   uint64_t mSubmissionIndex = 0;
   layers::RemoteTextureOwnerId mOwnerId;
+  gfx::ColorSpace2 mColorSpace = gfx::ColorSpace2::SRGB;
   RefPtr<layers::TextureHost> mTextureHost;
 };
 

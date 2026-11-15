@@ -269,6 +269,13 @@ gfx::YUVRangedColorSpace RenderTextureHostWrapper::GetYUVColorSpace() const {
   return gfx::YUVRangedColorSpace::Default;
 }
 
+gfx::ColorSpace2 RenderTextureHostWrapper::GetColorSpace2() const {
+  if (RenderTextureHostSWGL* swglHost = EnsureRenderTextureHostSWGL()) {
+    return swglHost->GetColorSpace2();
+  }
+  return gfx::ColorSpace2::UNKNOWN;
+}
+
 gfx::TransferFunction RenderTextureHostWrapper::GetTransferFunction() const {
   if (RenderTextureHostSWGL* swglHost = EnsureRenderTextureHostSWGL()) {
     return swglHost->GetTransferFunction();

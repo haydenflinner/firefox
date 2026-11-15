@@ -78,6 +78,14 @@ uint32_t SharedTextureMacIOSurface::GetIOSurfaceId() {
   return mSurface->GetIOSurfaceID();
 }
 
+void SharedTextureMacIOSurface::SetColorSpace(
+    const gfx::ColorSpace2 aColorSpace) {
+  SharedTexture::SetColorSpace(aColorSpace);
+  // The RGB gamut of a MacIOSurface travels as an IOSurface property, not in
+  // the surface descriptor.
+  mSurface->SetColorSpace(aColorSpace);
+}
+
 Maybe<layers::SurfaceDescriptor>
 SharedTextureMacIOSurface::ToSurfaceDescriptor() {
   MOZ_ASSERT(mSubmissionIndex > 0);

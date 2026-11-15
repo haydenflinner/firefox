@@ -920,9 +920,9 @@ DCSurface* DCExternalSurfaceWrapper::EnsureSurfaceForExternalImage(
     // -
 
     const auto cspace = [&]() {
-      const auto rangedCspace = texture->GetYUVColorSpace();
-      const auto info = FromYUVRangedColorSpace(rangedCspace);
-      auto ret = ToColorSpace2(info.space);
+      // GetColorSpace2() also conveys RGB gamuts such as DISPLAY_P3 that
+      // GetYUVColorSpace() cannot represent.
+      auto ret = texture->GetColorSpace2();
       if (ret == gfx::ColorSpace2::Display && cmsMode == CMSMode::All) {
         ret = gfx::ColorSpace2::SRGB;
       }

@@ -83,6 +83,13 @@ void SharedTextureDMABuf::CleanForRecycling() {
   mSemaphoreFd = nullptr;
 }
 
+void SharedTextureDMABuf::SetColorSpace(
+    const gfx::ColorSpace2 aColorSpace) {
+  SharedTexture::SetColorSpace(aColorSpace);
+  // The RGB gamut of a DMABufSurface is serialized as its color primaries.
+  mSurface->SetColorPrimaries(aColorSpace);
+}
+
 Maybe<layers::SurfaceDescriptor> SharedTextureDMABuf::ToSurfaceDescriptor() {
   MOZ_ASSERT(mSubmissionIndex > 0);
 

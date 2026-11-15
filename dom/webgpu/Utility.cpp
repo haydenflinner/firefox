@@ -661,6 +661,45 @@ ffi::WGPUPredefinedColorSpace ConvertPredefinedColorSpace(
   return result;
 }
 
+ffi::WGPUPredefinedColorSpace ConvertPredefinedColorSpace(
+    const dom::GPUPredefinedColorSpace& aColorSpace) {
+  ffi::WGPUPredefinedColorSpace result;
+  switch (aColorSpace) {
+    case dom::GPUPredefinedColorSpace::Srgb:
+      result = ffi::WGPUPredefinedColorSpace_Srgb;
+      break;
+    case dom::GPUPredefinedColorSpace::Display_p3:
+      result = ffi::WGPUPredefinedColorSpace_DisplayP3;
+      break;
+  }
+
+  return result;
+}
+
+dom::PredefinedColorSpace ToPredefinedColorSpace(
+    const dom::GPUPredefinedColorSpace& aColorSpace) {
+  switch (aColorSpace) {
+    case dom::GPUPredefinedColorSpace::Srgb:
+      return dom::PredefinedColorSpace::Srgb;
+    case dom::GPUPredefinedColorSpace::Display_p3:
+      return dom::PredefinedColorSpace::Display_p3;
+  }
+  MOZ_ASSERT_UNREACHABLE("unexpected GPUPredefinedColorSpace");
+  return dom::PredefinedColorSpace::Srgb;
+}
+
+gfx::ColorSpace2 ToColorSpace2(
+    ffi::WGPUPredefinedColorSpace aColorSpace) {
+  switch (aColorSpace) {
+    case ffi::WGPUPredefinedColorSpace_Srgb:
+      return gfx::ColorSpace2::SRGB;
+    case ffi::WGPUPredefinedColorSpace_DisplayP3:
+      return gfx::ColorSpace2::DISPLAY_P3;
+  }
+  MOZ_ASSERT_UNREACHABLE("unexpected WGPUPredefinedColorSpace");
+  return gfx::ColorSpace2::SRGB;
+}
+
 // Extract a list of dynamic offsets from a larger JS-supplied buffer.
 // Used by implementions of the `setBindGroup` method of the spec's
 // `GPUBindingCommandsMixin`.

@@ -1407,7 +1407,8 @@ bool WebGLContext::PushRemoteTexture(
     // If we can't serialize to a surface descriptor, then we need to create
     // a buffer to read back into that will become the remote texture.
     auto data = ownerClient->CreateOrRecycleBufferTextureData(
-        size, surfaceFormat, ownerId);
+        size, surfaceFormat, ToColorSpace2ForOutput(mDrawingBufferColorSpace),
+        gfx::TransferFunction::SRGB, ownerId);
     if (!data) {
       gfxCriticalNoteOnce << "Failed to allocate BufferTextureData";
       return onFailure();

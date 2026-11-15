@@ -583,7 +583,8 @@ void Queue::CopyExternalImageToTexture(
                     srcFormat, srcPremultiplied, dstBegin, dstStrideVal,
                     dstOriginPos, dstFormat, aDestination.mPremultipliedAlpha,
                     dom::PredefinedColorSpace::Srgb,
-                    dom::PredefinedColorSpace::Srgb, &wasTrivial)) {
+                    ToPredefinedColorSpace(aDestination.mColorSpace),
+                    &wasTrivial)) {
     MOZ_ASSERT_UNREACHABLE("ConvertImage failed!");
     aRv.ThrowInvalidStateError(
         nsPrintfCString("Failed to convert source to destination format "

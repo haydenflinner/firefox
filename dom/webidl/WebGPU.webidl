@@ -979,7 +979,7 @@ dictionary GPUTexelCopyTextureInfo {
 
 dictionary GPUCopyExternalImageDestInfo
          : GPUTexelCopyTextureInfo {
-    //GPUPredefinedColorSpace colorSpace = "srgb"; //TODO
+    GPUPredefinedColorSpace colorSpace = "srgb";
     boolean premultipliedAlpha = false;
 };
 
@@ -1302,12 +1302,17 @@ enum GPUCanvasAlphaMode {
     "premultiplied",
 };
 
+enum GPUPredefinedColorSpace {
+    "srgb",
+    "display-p3",
+};
+
 dictionary GPUCanvasConfiguration {
     required GPUDevice device;
     required GPUTextureFormat format;
     GPUTextureUsageFlags usage = 0x10;  // GPUTextureUsage.RENDER_ATTACHMENT
     sequence<GPUTextureFormat> viewFormats = [];
-    //GPUPredefinedColorSpace colorSpace = "srgb"; //TODO bug 1834395
+    GPUPredefinedColorSpace colorSpace = "srgb";
     //GPUCanvasToneMapping toneMapping = {}; //TODO bug 1834395
     GPUCanvasAlphaMode alphaMode = "opaque";
 };

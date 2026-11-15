@@ -87,6 +87,15 @@ class RenderTextureHost {
     return gfx::YUVRangedColorSpace::Default;
   }
 
+  // The color primaries of the texture's contents as a ColorSpace2. Unlike
+  // GetYUVColorSpace(), this can also express RGB gamuts that are not YUV
+  // color spaces, such as DISPLAY_P3. The default implementation derives it
+  // from GetYUVColorSpace().
+  virtual gfx::ColorSpace2 GetColorSpace2() const {
+    return gfx::ToColorSpace2(
+        gfx::FromYUVRangedColorSpace(GetYUVColorSpace()).space);
+  }
+
   virtual wr::WrExternalImage Lock(uint8_t aChannelIndex, gl::GLContext* aGL);
 
   virtual void Unlock() {}

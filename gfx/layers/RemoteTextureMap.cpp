@@ -275,18 +275,28 @@ UniquePtr<TextureData> RemoteTextureOwnerClient::GetRecycledTextureData(
 UniquePtr<TextureData>
 RemoteTextureOwnerClient::CreateOrRecycleBufferTextureData(
     const gfx::IntSize& aSize, gfx::SurfaceFormat aFormat,
+    gfx::ColorSpace2 aColorSpace, gfx::TransferFunction aTransferFunction,
     RemoteTextureOwnerId aOwnerId) {
   auto texture =
       GetRecycledTextureData(aSize, aFormat, TextureType::Unknown, aOwnerId);
   if (texture) {
-    return texture;
+    auto* bufferTexture = texture->AsBufferTextureData();
+    // A recycled buffer's color-space tag is baked into its descriptor, so a
+    // mismatched buffer would misdescribe the contents: drop it and allocate
+    // a fresh one instead.
+    if (bufferTexture &&
+        bufferTexture->GetColorSpace2().valueOr(gfx::ColorSpace2::UNKNOWN) ==
+            aColorSpace &&
+        bufferTexture->GetTransferFunction().valueOr(
+            gfx::TransferFunction::SRGB) == aTransferFunction) {
+      return texture;
+    }
   }
 
   auto flags = TextureFlags::DEALLOCATE_CLIENT | TextureFlags::REMOTE_TEXTURE;
   auto* data = BufferTextureData::Create(
-      aSize, aFormat, gfx::ColorSpace2::SRGB, gfx::TransferFunction::SRGB,
-      gfx::BackendType::SKIA, LayersBackend::LAYERS_WR, flags, ALLOC_DEFAULT,
-      nullptr);
+      aSize, aFormat, aColorSpace, aTransferFunction, gfx::BackendType::SKIA,
+      LayersBackend::LAYERS_WR, flags, ALLOC_DEFAULT, nullptr);
   return UniquePtr<TextureData>(data);
 }
 

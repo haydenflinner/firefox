@@ -912,6 +912,7 @@ pub extern "C" fn wgpu_client_create_swap_chain(
     queue_id: id::QueueId,
     desc: &FfiTextureDescriptor,
     format: crate::SurfaceFormat,
+    color_space: crate::PredefinedColorSpace,
     remote_texture_owner_id: crate::RemoteTextureOwnerId,
     use_shared_texture_in_swap_chain: bool,
 ) {
@@ -924,6 +925,7 @@ pub extern "C" fn wgpu_client_create_swap_chain(
         device_id,
         queue_id,
         format,
+        color_space,
         desc: desc.to_wgpu(),
         buffer_ids,
         remote_texture_owner_id,
